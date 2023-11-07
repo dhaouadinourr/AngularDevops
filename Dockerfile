@@ -23,5 +23,5 @@ COPY --from=build /dist/src/app/dist/crudtuto-Front /usr/share/nginx/html
 COPY /nginx.conf /etc/nginx/conf.d/default.conf
 # Exposer un port, ici cela signifie qu'à l'intérieur du conteneur
 # l'application utilisera le port 80 lors de son exécution
-EXPOSE 80
+EXPOSE 8090
 #NGINX est utilisé ici pour servir les fichiers statiques de l'application Angular, fournissant un serveur web léger, rapide et efficace pour servir ces fichiers au navigateur des utilisateurs finaux. 
