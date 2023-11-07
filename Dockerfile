@@ -5,7 +5,7 @@
 # lors de la génération de l'image docker
 FROM node:16.16-alpine AS build
 # Create a Virtual directory inside the docker image
-WORKDIR /app
+WORKDIR /dist/src/app
 # Run command in Virtual directory
 RUN npm cache clean --force
 # Copy files from local machine to virtual directory in docker image
