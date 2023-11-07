@@ -1,31 +1,26 @@
-# Stage 1: Build the Angular app
-FROM node:16.16-alpine  AS builder
-
-WORKDIR /app 
-
-# Copy package.json and package-lock.json files
-COPY package*.json ./
-
-# Install project dependencies
-RUN npm install
-
-# Copy the rest of the application code
+### ÉTAPE 1 : CONSTRUIRE ###
+# Définir une image de nœud à utiliser en lui donnant un alias "build"
+# La version de l'image Node à utiliser dépend des dépendances du projet
+# Ceci est nécessaire pour construire et compiler notre code
+# lors de la génération de l'image docker
+FROM node:16.16-alpine AS build
+# Create a Virtual directory inside the docker image
+WORKDIR /dist/src/app
+# Run command in Virtual directory
+RUN npm cache clean --force
+# Copy files from local machine to virtual directory in docker image
 COPY . .
-
-# Build the Angular app for production
+RUN npm install --force
 RUN npm run build --prod
 
-# Stage 2: Serve the app with Nginx
-FROM nginx:alpine
-
-# Remove default Nginx website
-RUN rm -rf /usr/share/nginx/html/*
-
-# Copy the built app from the builder stage to the Nginx directory
-COPY --from=builder /app/dist/crudtuto-Front /usr/share/nginx/html
-
-# Expose the port that Nginx will listen on (usually 80)
+### STAGE 2:RUN ###
+# Defining nginx image to be used
+FROM nginx:latest AS ngi
+# Copie du code compilé et de la configuration nginx dans un autre dossier
+# REMARQUE : Ce chemin peut changer en fonction du dossier de sortie de votre projet
+COPY --from=build /dist/src/app/dist/crudtuto-Front /usr/share/nginx/html
+COPY /nginx.conf /etc/nginx/conf.d/default.conf
+# Exposer un port, ici cela signifie qu'à l'intérieur du conteneur
+# l'application utilisera le port 80 lors de son exécution
 EXPOSE 80
-
-# Start Nginx in the foreground
-CMD ["nginx", "-g", "daemon off;"]
+#NGINX est utilisé ici pour servir les fichiers statiques de l'application Angular, fournissant un serveur web léger, rapide et efficace pour servir ces fichiers au navigateur des utilisateurs finaux. 
